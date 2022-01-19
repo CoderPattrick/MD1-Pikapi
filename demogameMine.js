@@ -4,7 +4,7 @@ let display ="";
 for (let i = 0; i < 8; i++) {
     arr[i]=[];
     for (let j = 0; j < 8; j++) {
-        arr[i][j]='<input type="button"  id="no'+i+j+'" value="" onClick="clickFunction('+i+','+j+')"></input>';
+        arr[i][j]='<input type="button"  id="no'+i+j+'" value=" " onClick="clickFunction('+i+','+j+')"></input>';
     }
 }
 for (let i = 0; i < 8; i++) {
@@ -43,7 +43,7 @@ function restartGame(){
     display ="";
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
-            arr[i][j]='<input type="button" id="no'+i+j+'" value="" onClick="clickFunction('+i+','+j+')"></input>';
+            arr[i][j]='<input type="button" id="no'+i+j+'" value=" " onClick="clickFunction('+i+','+j+')"></input>';
         }
     }
     for (let i = 0; i < 8; i++) {
