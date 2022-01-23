@@ -1,49 +1,19 @@
 let arr =[];
+let arr2=[];
 let arrvalue =[];
 let display ="";
-for (let i = 0; i < 8; i++) {
-    arr[i]=[];
-    for (let j = 0; j < 8; j++) {
-        arr[i][j]='<input type="button"  id="no'+i+j+'" value=" " onClick="clickFunction('+i+','+j+')"></input>';
-    }
-}
-for (let i = 0; i < 8; i++) {
-    for (let j = 0; j < 8; j++) {
-        display += arr[i][j];
-    }
-    display += "<br/>";
-}
-document.getElementById("display").innerHTML = display;
-for (let i = 0; i < 8; i++) {
-    arrvalue[i]=[]
-    for (let j = 0; j < 8; j++) {
-        let a = Math.random()*10;
-        if(a>8){
-            arrvalue[i][j]='&#9827'
-        }
-        else arrvalue[i][j] = 0;
-    }
-}
-for (let i = 0; i < 8; i++) {
-    for (let j = 0; j < 8; j++) {
-        if (arrvalue[i][j]=='&#9827'){
-            arrvalue[i-1][j-1]+=1;
-            arrvalue[i-1][j]+=1;
-            arrvalue[i-1][j+1]+=1;
-            arrvalue[i][j-1]+=1;
-            arrvalue[i][j+1]+=1;
-            arrvalue[i+1][j-1]+=1;
-            arrvalue[i+1][j]+=1;
-            arrvalue[i+1][j+1]+=1;
-        }
-    }
-}
+let safe = true;
+let safespot = 64;
+let level =[9,8.5,8,7.5,7,6.5];
+let cnt =0;
 
-function restartGame(){
-    display ="";
+function createBoard() {
     for (let i = 0; i < 8; i++) {
+        arr[i] = [];
+        arr2[i]=[];
         for (let j = 0; j < 8; j++) {
-            arr[i][j]='<input type="button" id="no'+i+j+'" value=" " onClick="clickFunction('+i+','+j+')"></input>';
+            arr[i][j] = '<input type="button" value=" " onClick="clickAction(' + i + ',' + j + ')"/>';
+            arr2[i][j]= 9;
         }
     }
     for (let i = 0; i < 8; i++) {
@@ -53,34 +23,110 @@ function restartGame(){
         display += "<br/>";
     }
     document.getElementById("display").innerHTML = display;
-
+}
+function setBoom(x) {
     for (let i = 0; i < 8; i++) {
-        arrvalue[i]=[]
+        arrvalue[i] = []
         for (let j = 0; j < 8; j++) {
-            let a = Math.random()*10;
-            if(a>8){
-                arrvalue[i][j]='&#9827'
+            let a = Math.random() * 10;
+            if (a > x) {
+                arrvalue[i][j] = '&#9827';
+                safespot--;
+                console.log(safespot)
             }
-            else arrvalue[i][j] = 0;
+            else {
+                arrvalue[i][j] = 0;
+            }
         }
     }
+}
+function setNumAfterBoom() {
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
-            if (arrvalue[i][j]=='&#9827'){
-                arrvalue[i-1][j-1]+=1;
-                arrvalue[i-1][j]+=1;
-                arrvalue[i-1][j+1]+=1;
-                arrvalue[i][j-1]+=1;
-                arrvalue[i][j+1]+=1;
-                arrvalue[i+1][j-1]+=1;
-                arrvalue[i+1][j]+=1;
-                arrvalue[i+1][j+1]+=1;
+            setNum(i,j);
+        }
+    }
+}
+function setNum(i,j){
+    if (arrvalue[i][j] != '&#9827') {
+        if(i-1>=0&&j-1>=0){if(arrvalue[i-1][j-1] == '&#9827'){arrvalue[i][j]++;}}
+        if(i-1>=0){if(arrvalue[i-1][j] == '&#9827'){arrvalue[i][j]++;}}
+        if(i-1>=0&&j+1<8){if(arrvalue[i-1][j+1] == '&#9827'){arrvalue[i][j]++;}}
+        if(j-1>=0){if(arrvalue[i][j-1] == '&#9827'){arrvalue[i][j]++;}}
+        if(j+1<8)if(arrvalue[i][j+1] == '&#9827'){arrvalue[i][j]++;}
+        if(i+1<8&&j-1>=0){if(arrvalue[i+1][j-1] == '&#9827'){arrvalue[i][j]++;}}
+        if(i+1<8)if(arrvalue[i+1][j] == '&#9827'){arrvalue[i][j]++;}
+        if(i+1<8&&j+1<8)if(arrvalue[i+1][j+1] == '&#9827'){arrvalue[i][j]++;}
+    }
+}
+
+function setGame(x){
+    display ="";
+    safespot = 64;
+    let lv = '';
+    if(cnt==5){
+        lv = "Level Hell";
+    }
+    else {
+        lv ="Level "+(cnt+1);
+    }
+    document.getElementById("level").innerHTML = lv;
+    setBoom(x);
+    setNumAfterBoom();
+    createBoard();
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j <8; j++) {
+            if(arrvalue[i][j]%2==1){
+                clickFunction(i,j);
+                return 1;
             }
         }
     }
 }
 function clickFunction(a,b){
-    arr[a][b]='<input type="button"  id="no'+a+b+'" value="'+arrvalue[a][b]+'" onClick="clickFunction('+a+','+b+')"></input>';
+    if(arr2[a][b]==arrvalue[a][b]){
+        return 1;
+    }
+    safespot--;
+    console.log(safespot);
+    arr[a][b]='<input type="button" value="'+arrvalue[a][b]+'"/>';
+    display ="";
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+            display += arr[i][j];
+        }
+        display += "<br/>";
+    }
+    document.getElementById("display").innerHTML = display;
+    arr2[a][b] = arrvalue[a][b];
+    if(arrvalue[a][b]=='&#9827'){
+        safe = false;
+        checkWin();
+        return 1;
+    }
+    if(safespot==0){
+        checkWin();
+    }
+}
+function clickAction(a,b){
+    clickFunction(a,b);
+    if(arrvalue[a][b]==0){
+        if(a-1>=0&&b-1>=0){clickFunction(a-1,b-1);}
+        if(a-1>=0){clickFunction(a-1,b);}
+        if(a-1>=0&&b+1<8){clickFunction(a-1,b+1);}
+        if(b-1>=0){clickFunction(a,b-1);}
+        if(b+1<8){clickFunction(a,b+1);}
+        if(a+1<8&&b-1>=0){clickFunction(a+1,b-1);}
+        if(a+1<8){clickFunction(a+1,b);}
+        if(a+1<8&&b+1<8){clickFunction(a+1,b+1);}
+    }
+}
+function revealBoard(){
+    for (let i = 0; i < arr.length; i++) {
+        for (let j = 0; j < arr.length; j++) {
+            arr[i][j]='<input type="button" value="'+arrvalue[i][j]+'"/>'
+        }
+    }
     display ="";
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
@@ -90,3 +136,33 @@ function clickFunction(a,b){
     }
     document.getElementById("display").innerHTML = display;
 }
+function checkWin(){
+    if(safe){
+        alert("You Win!");
+        cnt++;
+        if(cnt==level.length){
+            alert("You are genius! Now turn off the computer and save the world!");
+            document.getElementById("nextLevel").innerHTML = "Looking for what? There's no next level!"
+            return 1;
+        }
+        let a = confirm("Next Level?");
+        if(a){
+            let x = '<button onClick="nextLevel('+ level[cnt] +')">Begin Next Level</button>'
+            document.getElementById("nextLevel").innerHTML = x;
+        }
+    }
+    else{
+        alert("Boom! You're dead!");
+    }
+    revealBoard();
+    safe = true;
+}
+function nextLevel(x){
+    setGame(x);
+    document.getElementById("nextLevel").innerHTML = '';
+}
+function restartGame(){
+    cnt=0;
+    setGame(level[cnt]);
+}
+setGame(level[cnt]);
